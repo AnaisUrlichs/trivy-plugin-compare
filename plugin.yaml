@@ -1,0 +1,28 @@
+name: "compare"
+repository: github.com/AnaisUrlichs/trivy-plugin-compare
+version: "0.1.0"
+usage: compare two scan results
+description: |-
+  A Trivy plugin that compares two scan results
+  Usage: trivy compare ./file-path-one ./file-path-two
+platforms:
+  - selector:
+      os: darwin
+      arch: amd64
+    uri: https://github.com/AnaisUrlichs/trivy-plugin-compare/releases/download/v0.1.0/trivy-compare.tar.gz
+    bin: ./compare
+  - selector:
+      os: darwin
+      arch: arm64
+    uri: https://github.com/AnaisUrlichs/trivy-plugin-compare/releases/download/v0.1.0/trivy-compare.tar.gz
+    bin: ./compare
+  - selector:
+      os: linux
+      arch: amd64
+    uri: https://github.com/AnaisUrlichs/trivy-plugin-compare/releases/download/v0.1.0/trivy-compare.tar.gz
+    bin: ./compare
+  - selector:
+      os: linux
+      arch: arm64
+    uri: https://github.com/AnaisUrlichs/trivy-plugin-compare/releases/download/v0.1.0/trivy-compare.tar.gz
+    bin: ./compare
