@@ -26,4 +26,4 @@ jobs:
           version: v1.22.1
           args: release -f=goreleaser.yaml --rm-dist --timeout 60m
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACC_TOKEN }}
