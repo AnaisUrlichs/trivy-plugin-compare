@@ -2,9 +2,10 @@ module github.com/AnaisUrlichs/trivy-plugin-compare
 
 go 1.21.6
 
+require github.com/aquasecurity/trivy v0.49.1
+
 require (
 	github.com/anchore/go-struct-converter v0.0.0-20221118182256-c68fdcfa2092 // indirect
-	github.com/aquasecurity/trivy v0.49.1 // indirect
 	github.com/aquasecurity/trivy-db v0.0.0-20231005141211-4fc651f7ac8d // indirect
 	github.com/google/go-containerregistry v0.19.0 // indirect
 	github.com/package-url/packageurl-go v0.1.2 // indirect
