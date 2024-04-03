@@ -27,18 +27,28 @@ func Difference(a, b types.Result) (diffResult types.Result) {
 	mpOne := make(map[string]bool)
 	mpTwo := make(map[string]bool)
 
+	// first, go through each vulnerability in the first report and add the ID to the map
 	for _, s1 := range vulnOne {
 		mpOne[s1.VulnerabilityID] = true
 	}
 
+	// next, go through each vulnerability in the second report
 	for _, s2 := range vulnTwo {
+
+		// if the vulnerability does not exist in the first report, add it to the results
+		// this works for cases in which the second report is longer than the first
 		if _, y := mpOne[s2.VulnerabilityID]; !y {
 			diffResult.Vulnerabilities = append(diffResult.Vulnerabilities, s2)
 		}
+
+		// add rach vulnerability from the second report to a separate map
 		mpTwo[s2.VulnerabilityID] = true
 	}
 
+	// lastly, check whether the vulnerabilities from the first report are all present in the second report
 	for _, s1 := range vulnOne {
+		// if a vulnerability is in the first report but not in the second, add it to the results
+		// this is necessary for cases where the first report is longer than the second report
 		if _, y := mpTwo[s1.VulnerabilityID]; !y {
 			diffResult.Vulnerabilities = append(diffResult.Vulnerabilities, s1)
 		}
