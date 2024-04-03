@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/aquasecurity/trivy/pkg/types"
-	// nolint: goimports
 )
 
 // Report represents a scan result
@@ -25,30 +24,24 @@ func Difference(a, b types.Result) (diffResult types.Result) {
 	vulnOne := a.Vulnerabilities
 	vulnTwo := b.Vulnerabilities
 
-	// Loop two times, first to find Report 1 Vulnerabilities not in Report 2,
-	// second loop to find Report 2 Vulnerabilities strings not in Report 1
-	for i := 0; i < 2; i++ {
-		// Iterate through the list of vulnerabilities in the first report
-		for _, s1 := range vulnOne {
-			found := false
-			// Iterate through the list of vulnerabilities in the second report
-			for _, s2 := range vulnTwo {
-				if s1.VulnerabilityID == s2.VulnerabilityID {
-					found = true
-					break
-				}
-			}
-			// String not found. We add it to the list of different vulnerabilities
-			if !found {
-				diffResult.Vulnerabilities = append(diffResult.Vulnerabilities, s1)
-			}
-		}
+	mpOne := make(map[string]bool)
+	mpTwo := make(map[string]bool)
 
-		// Swap the two Vulnerability Reports, only if it was the first loop
-		if i == 0 {
-			vulnOne, vulnTwo = vulnTwo, vulnOne
-		}
+	for _, s1 := range vulnOne {
+		mpOne[s1.VulnerabilityID] = true
+	}
 
+	for _, s2 := range vulnTwo {
+		if _, y := mpOne[s2.VulnerabilityID]; !y {
+			diffResult.Vulnerabilities = append(diffResult.Vulnerabilities, s2)
+		}
+		mpTwo[s2.VulnerabilityID] = true
+	}
+
+	for _, s1 := range vulnOne {
+		if _, y := mpTwo[s1.VulnerabilityID]; !y {
+			diffResult.Vulnerabilities = append(diffResult.Vulnerabilities, s1)
+		}
 	}
 
 	return diffResult
