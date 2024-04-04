@@ -1,6 +1,6 @@
 name: "compare"
 repository: github.com/AnaisUrlichs/trivy-plugin-compare
-version: "0.1.0"
+version: "0.1.1"
 usage: compare two scan results
 description: |-
   A Trivy plugin that compares two scan results
