@@ -2,9 +2,9 @@ name: Audit
 
 on:
   push:
-    branches: [iteration-two]
+    branches: [main]
   pull_request:
-    branches: [iteration-two]
+    branches: [main]
 
 jobs:
 
