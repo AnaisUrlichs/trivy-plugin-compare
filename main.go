@@ -87,19 +87,19 @@ func main() {
 	}
 
 	// Open each file
-	openFileOne, err := os.Open(filePathOne)
-	openFileTwo, err := os.Open(filePathTwo)
+	openFileOne, errOne := os.Open(filePathOne)
+	openFileTwo, errTwo := os.Open(filePathTwo)
 
-	if err != nil {
-		fmt.Println("Error: Could not open file(s)", err)
+	if errOne != nil || errTwo != nil {
+		fmt.Println("Error: Could not open file(s)", errOne, errTwo)
 	}
 
 	// Read everything in the file
-	fileOneBytes, err := io.ReadAll(openFileOne)
-	fileTwoBytes, err := io.ReadAll(openFileTwo)
+	fileOneBytes, errOne := io.ReadAll(openFileOne)
+	fileTwoBytes, errTwo := io.ReadAll(openFileTwo)
 
-	if err != nil {
-		fmt.Println("Error two", err)
+	if errOne != nil || errTwo != nil {
+		fmt.Println("Error two", errOne, errTwo)
 	}
 
 	// Don't close the file yet
