@@ -20,9 +20,15 @@ type Results []Result
 // Result holds a target and detected vulnerabilities
 type Result types.Result
 
-func Difference(a, b types.Result) (diffResult types.Result) {
+// function comparing two Trivy scan results to identify differences in Vulnerabilities
+func Difference(a, b types.Result) (diffResult types.Result, err error) {
 	vulnOne := a.Vulnerabilities
 	vulnTwo := b.Vulnerabilities
+
+	if vulnOne == nil || vulnTwo == nil {
+		err = errors.New("something went wrong accessign the vulnerabilities")
+		return diffResult, err
+	}
 
 	mpOne := make(map[string]bool)
 	mpTwo := make(map[string]bool)
@@ -54,21 +60,35 @@ func Difference(a, b types.Result) (diffResult types.Result) {
 		}
 	}
 
-	return diffResult
+	return diffResult, nil
 }
 
 // This function checks which report is older; the newer report will be modified to display the difference between both reports
-func checkTimestamp(resultsOne, resultsTwo Report) (olderReport, newerReport Report) {
+func checkTimestamp(resultsOne, resultsTwo Report) (olderReport, newerReport Report, err error) {
 	if resultsOne.CreatedAt.Before(resultsTwo.CreatedAt) {
-		return resultsOne, resultsTwo
+		return resultsOne, resultsTwo, nil
 	}
 
-	return resultsTwo, resultsOne
+	return resultsTwo, resultsOne, nil
+}
+
+// The second report needs to be updated with the difference between both reports
+func saveResult(olderReport, newerReport Report, diffResult types.Result) {
+
+	newerReport.Results[0].Vulnerabilities = diffResult.Vulnerabilities
+	newerReport.Results[0].Target = "This is the difference between image one " + newerReport.Results[0].Target + " and two " + olderReport.Results[0].Target
+
+	o, _ := json.MarshalIndent(newerReport, "", "  ")
+	_ = os.WriteFile("diff.json", o, 0644)
 }
 
 func main() {
 
-	var diffResult types.Result
+	if len(os.Args) <= 2 {
+		err := errors.New("no arguments or not enough provided")
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	// Access the files paths provided
 	filePathOne := os.Args[1]
@@ -91,7 +111,8 @@ func main() {
 	openFileTwo, errTwo := os.Open(filePathTwo)
 
 	if errOne != nil || errTwo != nil {
-		fmt.Println("Error: Could not open file(s)", errOne, errTwo)
+		fmt.Println("Error: Could not open file(s) \n", errOne, errTwo)
+		os.Exit(1)
 	}
 
 	// Read everything in the file
@@ -99,7 +120,8 @@ func main() {
 	fileTwoBytes, errTwo := io.ReadAll(openFileTwo)
 
 	if errOne != nil || errTwo != nil {
-		fmt.Println("Error two", errOne, errTwo)
+		fmt.Println("Error: Could not read the file \n", errOne, errTwo)
+		os.Exit(1)
 	}
 
 	// Don't close the file yet
@@ -113,19 +135,17 @@ func main() {
 	var resultsTwo Report
 	json.Unmarshal(fileTwoBytes, &resultsTwo)
 
-	olderReport, newerReport := checkTimestamp(resultsOne, resultsTwo)
+	olderReport, newerReport, err := checkTimestamp(resultsOne, resultsTwo)
 
-	diffResult = Difference(olderReport.Results[0], newerReport.Results[0])
+	if err != nil {
+		fmt.Println("Error: \n", err)
+	}
+
+	diffResult, err := Difference(olderReport.Results[0], newerReport.Results[0])
+
+	if err != nil {
+		fmt.Println("Error: \n", err)
+	}
 
 	saveResult(olderReport, newerReport, diffResult)
-}
-
-// The second report needs to be updated with the difference between both reports
-func saveResult(olderReport, newerReport Report, diffResult types.Result) {
-
-	newerReport.Results[0].Vulnerabilities = diffResult.Vulnerabilities
-	newerReport.Results[0].Target = "This is the difference between image one " + newerReport.Results[0].Target + " and two " + olderReport.Results[0].Target
-
-	o, _ := json.MarshalIndent(newerReport, "", "  ")
-	_ = os.WriteFile("diff.json", o, 0644)
 }

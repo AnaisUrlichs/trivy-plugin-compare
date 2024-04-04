@@ -8,7 +8,6 @@ import (
 	"github.com/aquasecurity/trivy/pkg/types"
 )
 
-var diffResultIs types.Result
 var resultOne types.Result
 var resultTwo types.Result
 
@@ -40,7 +39,11 @@ func TestDifference(t *testing.T) {
 
 	expectedVulnID := "CVE-2023-52426"
 
-	diffResultIs = Difference(resultOne, resultTwo)
+	diffResultIs, err := Difference(resultOne, resultTwo)
+
+	if err != nil {
+		fmt.Println("Error: \n", err)
+	}
 
 	if diffResultIs.Vulnerabilities == nil {
 		t.Errorf("No differences found between reports")
